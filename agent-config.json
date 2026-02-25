@@ -1,0 +1,20 @@
+{
+  "name": "Voice Scheduling Agent",
+  "model": {
+    "provider": "openai",
+    "model": "gpt-4o-mini"
+  },
+  "tools": [
+    {
+      "type": "google-calendar",
+      "events": {
+        "create": { "enabled": true },
+        "check_availability": { "enabled": true }
+      }
+    }
+  ],
+  "voice": {
+    "provider": "11labs",
+    "voiceId": "EXAVITQu4vr4xnSDxMaL"
+  }
+}
