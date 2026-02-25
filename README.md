@@ -3,7 +3,7 @@
 A production-ready voice assistant for scheduling appointments. Features a custom web interface, real-time voice orchestration, and Google Calendar integration.
 
 ## 🌐 Live Application
-**Web App:** [https://voice-scheduler-assessment.vercel.app](https://your-vercel-url.vercel.app)  
+**Web App:** [https://voice-scheduling-agent-virid.vercel.app](https://voice-scheduling-agent-virid.vercel.app)
 *(Click "Start Call" to speak with Riley)*
 
 ## ✅ Assignment Requirements
@@ -39,4 +39,4 @@ To prevent tool failures from blocking bookings:
 - **Timeout Handling:** The agent waits max 5 seconds for availability response before proceeding.
 
 ## 🎥 Demo
-[Insert Loom Link]
+(Not Done Yet)
