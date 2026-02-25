@@ -19,70 +19,78 @@
     <div class="container">
         <h1>🎙️ Schedule an Appointment</h1>
         <p>Speak with Riley, our AI scheduling assistant.</p>
-        <button class="btn" onclick="startCall()" disabled>Loading...</button>
+        <button id="callBtn" class="btn" onclick="toggleCall()" disabled>Loading...</button>
         <div id="status" class="status"></div>
     </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/dist/vapi.js"></script>
-<script>
-    let vapi;
-    let agentId;
-    const statusDiv = document.getElementById('status');
-    const btn = document.querySelector('.btn');
+    <script src="https://cdn.jsdelivr.net/gh/VapiAI/html-script-tag@latest/dist/assets/index.js"></script>
+    
+    <script>
+        let vapiInstance = null;
+        const statusDiv = document.getElementById('status');
+        const btn = document.getElementById('callBtn');
 
-    async function init() {
-        try {
-            const res = await fetch('/api/get-config');
-            if (!res.ok) throw new Error('Failed to load config');
-            const config = await res.json();
-            
-            // 1. Initialize Vapi
-            vapi = new Vapi(config.publicKey);
-            agentId = config.agentId;
+        async function init() {
+            try {
+                const res = await fetch('/api/get-config');
+                if (!res.ok) throw new Error('Failed to load config');
+                const config = await res.json();
 
-            // 2. Attach Listeners IMMEDIATELY after initialization
-            vapi.on('call-start', () => { 
-                statusDiv.innerText = "Call active..."; 
-                console.log('Call started');
-            });
-            
-            vapi.on('call-end', () => { 
-                statusDiv.innerText = "Call ended."; 
+                // Initialize using the window.vapiSDK object
+                vapiInstance = window.vapiSDK.run({
+                    apiKey: config.publicKey,
+                    assistant: config.agentId,
+                    config: {
+                        position: "bottom-right", // This creates the default button
+                        showCloseButton: true
+                    }
+                });
+
+                // Set up event listeners on the instance
+                vapiInstance.on('call-start', () => {
+                    statusDiv.innerText = "Call active...";
+                    btn.innerText = "Stop Call";
+                    btn.style.background = "#dc2626"; // Change to red when active
+                    btn.disabled = false;
+                });
+
+                vapiInstance.on('call-end', () => {
+                    statusDiv.innerText = "Call ended.";
+                    btn.innerText = "Start Call";
+                    btn.style.background = "#2563eb"; // Back to blue
+                    btn.disabled = false;
+                });
+
+                vapiInstance.on('error', (err) => {
+                    console.error("Vapi Error:", err);
+                    statusDiv.innerText = "Error connecting.";
+                    btn.disabled = false;
+                });
+
+                // Ready to go
                 btn.disabled = false;
                 btn.innerText = "Start Call";
-                console.log('Call ended');
-            });
 
-            vapi.on('error', (error) => {
-                console.error('Vapi Error:', error);
-                statusDiv.innerText = "An error occurred.";
-                btn.disabled = false;
-            });
-
-            // 3. Enable the button
-            btn.disabled = false;
-            btn.innerText = "Start Call";
-        } catch (error) {
-            console.error(error);
-            btn.innerText = "Error Loading";
-            statusDiv.innerText = "Failed to initialize.";
-            statusDiv.style.color = "#dc2626";
+            } catch (error) {
+                console.error("Init Error:", error);
+                statusDiv.innerText = "Failed to load assistant.";
+                btn.innerText = "Error";
+            }
         }
-    }
 
-    async function startCall() {
-        statusDiv.innerText = "Connecting...";
-        btn.disabled = true;
-        try {
-            await vapi.start(agentId);
-        } catch (error) {
-            console.error(error);
-            statusDiv.innerText = "Connection failed.";
-            btn.disabled = false;
+        // Toggle function to handle both starting and stopping
+        function toggleCall() {
+            if (statusDiv.innerText === "Call active...") {
+                vapiInstance.stop();
+            } else {
+                statusDiv.innerText = "Connecting...";
+                btn.disabled = true;
+                vapiInstance.start();
+            }
         }
-    }
 
-    init();
-</script>
+        // Run on load
+        window.addEventListener('load', init);
+    </script>
 </body>
 </html>
