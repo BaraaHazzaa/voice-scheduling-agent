@@ -11,6 +11,7 @@
         p { color: #6b7280; margin-bottom: 2rem; }
         .btn { background: #2563eb; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-size: 1rem; cursor: pointer; transition: background 0.2s; }
         .btn:hover { background: #1d4ed8; }
+        .btn:disabled { background: #9ca3af; cursor: not-allowed; }
         .status { margin-top: 1rem; font-size: 0.875rem; color: #059669; }
     </style>
 </head>
@@ -18,31 +19,56 @@
     <div class="container">
         <h1>🎙️ Schedule an Appointment</h1>
         <p>Speak with Riley, our AI scheduling assistant.</p>
-        <button class="btn" onclick="startCall()">Start Call</button>
+        <button class="btn" onclick="startCall()" disabled>Loading...</button>
         <div id="status" class="status"></div>
     </div>
 
-    <!-- VAPI Web SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@1.0.0/dist/index.js"></script>
     <script>
-        // ⚠️ REPLACE WITH YOUR PUBLIC KEY FROM VAPI DASHBOARD
-        const vapi = new Vapi("YOUR_PUBLIC_KEY_HERE"); 
-
+        let vapi;
+        let agentId;
         const statusDiv = document.getElementById('status');
+        const btn = document.querySelector('.btn');
+
+        async function init() {
+            try {
+                const res = await fetch('/api/get-config');
+                if (!res.ok) throw new Error('Failed to load config');
+                const config = await res.json();
+                
+                vapi = new Vapi(config.publicKey);
+                agentId = config.agentId;
+
+                btn.disabled = false;
+                btn.innerText = "Start Call";
+            } catch (error) {
+                console.error(error);
+                btn.innerText = "Error Loading";
+                statusDiv.innerText = "Failed to initialize.";
+                statusDiv.style.color = "#dc2626";
+            }
+        }
 
         async function startCall() {
             statusDiv.innerText = "Connecting...";
+            btn.disabled = true;
             try {
-                await vapi.start("YOUR_AGENT_ID_HERE"); // Or use template ID
+                await vapi.start(agentId);
                 statusDiv.innerText = "Call connected!";
             } catch (error) {
                 console.error(error);
                 statusDiv.innerText = "Connection failed.";
+                btn.disabled = false;
             }
         }
 
-        vapi.on('call-start', () => { statusDiv.innerText = "Call active..."; });
-        vapi.on('call-end', () => { statusDiv.innerText = "Call ended."; });
+        vapi?.on('call-start', () => { statusDiv.innerText = "Call active..."; });
+        vapi?.on('call-end', () => { 
+            statusDiv.innerText = "Call ended."; 
+            btn.disabled = false; 
+        });
+
+        init();
     </script>
 </body>
 </html>
