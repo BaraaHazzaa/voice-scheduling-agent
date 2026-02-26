@@ -1,42 +1,43 @@
-# 🎙️ Voice Scheduling Agent
+# 🎙️ Voice Scheduling Agent - Wellness Partners
 
-A production-ready voice assistant for scheduling appointments. Features a custom web interface, real-time voice orchestration, and Google Calendar integration.
+A production-ready voice assistant for scheduling appointments, built for the AI Engineer assignment. Features a custom web interface, real-time voice orchestration, and native Google Calendar integration.
 
 ## 🌐 Live Application
-**Web App:** [https://voice-scheduling-agent-virid.vercel.app](https://voice-scheduling-agent-virid.vercel.app)
+**Web App:** [https://voice-scheduling-agent-rfl1mqs1o-baraahazzaas-projects.vercel.app/](https://voice-scheduling-agent-rfl1mqs1o-baraahazzaas-projects.vercel.app/)
 *(Click "Start Call" to speak with Riley)*
 
+## 🚀 How to Test the Agent
+1. **Open the Live URL** above.
+2. **Click "Start Call"** and grant microphone permissions.
+3. **Talk to Riley:**
+   - Provide your name when asked.
+   - Request a time (e.g., "Can I book for next Tuesday at 2 PM?").
+   - Confirm the details when Riley summarizes the appointment.
+4. **Verification:** Riley will use the `google_calendar_check_availability_tool` to ensure no conflicts exist before using `google_calendar_tool` to finalize the booking.
+
 ## ✅ Assignment Requirements
-- [x] **Initiates Conversation:** Custom web interface triggers the agent.
-- [x] **Collects Details:** Name, Date/Time, Meeting Title.
-- [x] **Confirms Details:** Explicit confirmation loop before booking.
-- [x] **Creates Event:** Real Google Calendar event via API.
-- [x] **Deployed:** Hosted on Vercel + VAPI Cloud.
+- [x] **Initiates Conversation:** Custom web interface triggers the agent using VAPI Web SDK.
+- [x] **Collects Details:** Captures Name, Date/Time, and Meeting Title one-by-one.
+- [x] **Confirms Details:** Mandatory explicit confirmation loop before any API action.
+- [x] **Creates Event:** Real-time Google Calendar event creation via Native VAPI Integration.
+- [x] **Deployed:** Hosted on Vercel (Frontend/API) + VAPI Cloud (Voice Orchestration).
 
 ## 🛠️ Tech Stack
 - **Frontend:** HTML5 + VAPI Web SDK (Deployed on Vercel)
 - **Voice Orchestrator:** VAPI (STT, LLM, TTS)
-- **LLM:** OpenAI GPT-4o-mini
-- **Calendar:** Google Calendar API (OAuth 2.0)
+- **LLM:** OpenAI GPT-4o
+- **Calendar:** Native Google Calendar API Integration
 
 ## 🗓️ Calendar Integration
-- **Auth:** OAuth 2.0 via VAPI Integrations.
-- **Verification:** A standalone Python script (`/scripts/verify_calendar.py`) is included to validate API payload structures independently of the voice layer.
-- **Logic:** Events are created only after explicit user confirmation to prevent hallucinated bookings.
+- **Mechanism:** Utilizes VAPI's native tool-calling schema to interact directly with the Google Calendar API.
+- **Availability:** Implements `google_calendar_check_availability_tool` to provide real-time conflict detection during the call.
+- **Reliability:** Uses ISO 8601 formatting and dynamic date injection (`{{now}}`) to ensure accuracy across years and timezones.
 
 ## 🧠 Engineering Decisions
-
 ### Why Check Availability?
-Initially, this feature was excluded from the MVP to reduce latency. However, **double-booking is a critical failure mode** for a scheduling agent. After reviewing the user story, I decided to include it because:
+To prevent **double-booking**, a critical failure in scheduling agents. 
 1. **Data Integrity:** Prevents accidental calendar conflicts.
-2. **User Trust:** Users expect the agent to know their schedule.
-3. **Edge Case Handling:** Shows the agent can handle real-world scenarios.
+2. **User Trust:** Demonstrates the agent has actual "knowledge" of the calendar state.
 
-### Risk Mitigation
-To prevent tool failures from blocking bookings:
-- **Fallback Logic:** If the availability check fails, the agent asks the user if they want to proceed anyway.
-- **User Override:** Users can force a booking even if a conflict is detected (e.g., for overlapping meetings).
-- **Timeout Handling:** The agent waits max 5 seconds for availability response before proceeding.
-
-## 🎥 Demo
-(Not Done Yet)
+### Fallback Safety
+If the availability tool fails, the agent is instructed to ask the user if they wish to proceed anyway, ensuring the user is never blocked by a transient API error.

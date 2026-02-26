@@ -10,11 +10,13 @@ export default async function handler(req, res) {
   // Handle tool calls
   if (body.message?.type === "tool-calls") {
     const toolCall = body.message.toolCallList[0];
-    const args = toolCall.function.arguments;
+    const args =
+    typeof toolCall.function.arguments === "string"
+    ? JSON.parse(toolCall.function.arguments)
+    : toolCall.function.arguments;
 
     const { title, start_time, end_time, description } = args;
 
-    // TODO: Call Google Calendar here
 
     return res.status(200).json({
       results: [
