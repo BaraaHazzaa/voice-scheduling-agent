@@ -3,7 +3,7 @@
 A production-ready voice assistant for scheduling appointments, built for the AI Engineer assignment. Features a custom web interface, real-time voice orchestration, and native Google Calendar integration.
 
 ## 🌐 Live Application
-**Web App:** [https://voice-scheduling-agent-rfl1mqs1o-baraahazzaas-projects.vercel.app/](https://voice-scheduling-agent-rfl1mqs1o-baraahazzaas-projects.vercel.app/)
+**Web App:** [https://voice-scheduling-agent-virid.vercel.app/](https://voice-scheduling-agent-virid.vercel.app/)
 *(Click "Start Call" to speak with Riley)*
 
 ## 🚀 How to Test the Agent
